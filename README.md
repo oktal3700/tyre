@@ -23,7 +23,7 @@ Motivation
 Usage
 -----
 
-[example.cpp] contains a simple example of usage.
+The repository contains a [simple example](example.cpp) of usage.
 
 `tyre::any` is a class template with a single type template parameter. Its template argument `VP` is a policy class that describes the set of visitor functions that can be used on contained objects. `Vs` must be a class with a single static constexpr data member `visitors` of type instantiated from the class template `tyre::visitor_list`. The constructor of `tyre::visitor_list` accepts an arbitrary number of arguments that result from calling the function template `tyre::visitor`.
 
