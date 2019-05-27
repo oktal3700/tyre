@@ -3,7 +3,7 @@ tyre
 
 `tyre` is generic TYpe erasuRE for c++.
 
-`tyre` is a tiny (400 LOC) header-only C++17 library with no dependencies except the standard library.
+`tyre` is a tiny (under 500 LOC) header-only C++17 library with no dependencies except the standard library.
 
 `tyre` provides a single new abstraction: `tyre::any`.
 
@@ -161,4 +161,4 @@ template <typename VP, typename T, typename U, typename... Ts>
 any<VP> make_any(std::initializer_list<U> il, Ts&&... args);
 ```
 
-Differs from `std::make_any` only in that the template argument for `VP` is required to be explicitly specified in addition to `T`. _[Note: The call is ill-formed if there is no matching overload for the corresponding in-place constructor of `tyre::any`.]_
+Differs from `std::make_any` only in that the template argument for `VP` is required to be explicitly specified in addition to `T`. _[Note: The call is ill-formed if there is no matching overload for the corresponding in-place constructor of `tyre::any`. This means that the diagnostics issued by `tyre::make_any` can help to identify the exact reason why a constructor was excluded from the overload set.]_

@@ -185,7 +185,7 @@ namespace tyre
         struct make_any_helper
         {
             template <typename T>
-            using is_invocable = typename Vs::template is_invocable<T>;
+            using assert_invocable = typename Vs::template assert_invocable<T>;
         };
         template <typename Any>
         struct visit_helper

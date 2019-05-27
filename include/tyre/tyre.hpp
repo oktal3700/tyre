@@ -12,11 +12,25 @@
 namespace tyre
 {
     template <typename Tag, typename Sig, typename Func>
-    struct visitor_t
+    class visitor_t
     {
+    public:
         using tag_type = Tag;
         using signature = Sig;
         Func function;
+
+    private:
+        template <typename... Vs>
+        friend class visitor_list;
+
+        template <typename T>
+        static constexpr bool is_invocable_v = detail::is_invocable_sig<typename detail::transform_sig<Sig, T>::type, Func>::value;
+
+        template <typename T>
+        struct assert_invocable
+        {
+            static_assert(is_invocable_v<T>, "visitor function does not match its signature after substituting T for std::any");
+        };
     };
 
     template <typename Tag, typename Sig, typename Func>
@@ -40,9 +54,11 @@ namespace tyre
         template <typename T>
         struct is_invocable
         {
-            static constexpr bool value =
-                (detail::is_invocable_sig<typename detail::transform_sig<typename Vs::signature, T>::type, decltype(Vs::function)>::value && ...);
+            static constexpr bool value = (Vs::template is_invocable_v<T> && ...);
         };
+
+        template <typename T>
+        struct assert_invocable : Vs::template assert_invocable<T>... {};
 
         template <typename T>
         constexpr auto make_functions() const
@@ -192,8 +208,7 @@ namespace tyre
     template <typename VP, typename T, typename... Ts>
     any<VP> make_any(Ts&&... args)
     {
-        static_assert(detail::make_any_helper<decltype(VP::visitors)>::template is_invocable<T>::value,
-            "visitor function does not match its signature after substituting T for std::any");
+        typename detail::make_any_helper<decltype(VP::visitors)>::template assert_invocable<T>();
         static_assert(std::is_copy_constructible_v<T>, "T is not copy constructible");
         static_assert(detail::is_constructible<T, Ts...>::value,
             "no matching constructor of T for these arguments");
@@ -203,8 +218,7 @@ namespace tyre
     template <typename VP, typename T, typename U, typename... Ts>
     any<VP> make_any(std::initializer_list<U> il, Ts&&... args)
     {
-        static_assert(detail::make_any_helper<decltype(VP::visitors)>::template is_invocable<T>::value,
-            "visitor function does not match its signature after substituting T for std::any");
+        typename detail::make_any_helper<decltype(VP::visitors)>::template assert_invocable<T>();
         static_assert(std::is_copy_constructible_v<T>, "T is not copy constructible");
         static_assert(detail::is_constructible<T, std::initializer_list<U>&, Ts...>::value,
             "no matching constructor of T for these arguments");
