@@ -111,7 +111,7 @@ public:
 };
 ```
 
-Requires: `Vs` be a pack of types returned by `tyre::visitor`. Their types can be deduced by class template argument deduction.
+Requires: `Vs` be a pack of types returned by `tyre::visitor`. _[Note: Their types can be deduced by class template argument deduction.]_
 
 ### `tyre::visitor`
 
