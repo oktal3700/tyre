@@ -157,13 +157,8 @@ namespace tyre
         template <typename T>
         static constexpr erased_functions s_erased_functions = s_functions<T>;
 
-        static any make_from(std::any&& a, erased_functions const* v)
-        {
-            any result;
-            result.m_any = std::move(a);
-            result.m_vis = v;
-            return result;
-        }
+        template <typename Tag, typename... Ts>
+        decltype(auto) visit(Ts&&... args) const;
 
         std::any m_any;
         erased_functions const* m_vis = nullptr;
@@ -172,25 +167,31 @@ namespace tyre
     template <typename Tag, typename... Ts>
     decltype(auto) visit(Ts&&... args)
     {
-        auto&& first_any = detail::get_any(std::forward<Ts>(args)...);
-        static_assert(! detail::is_null_v<decltype(first_any)>, "at least one argument to tyre::visit must be a tyre::any");
-        static_assert((detail::is_compatible_v<decltype(first_any), Ts> && ...), "all tyre::any arguments must have the same type");
+        auto&& any = detail::get_any(std::forward<Ts>(args)...);
+        static_assert(! detail::is_null_v<decltype(any)>, "at least one argument to tyre::visit must be a tyre::any");
+        static_assert((detail::is_compatible_v<decltype(any), Ts> && ...), "all tyre::any arguments must have the same type");
+        return detail::visit_helper<detail::remove_cvref_t<decltype(any)>>::template visit<Tag>(any, std::forward<Ts>(args)...);
+    }
 
-        using helper = detail::visit_helper<detail::remove_cvref_t<decltype(first_any)>>;
-        if (! helper::m_vis(first_any)) { throw std::bad_any_cast(); }
-        auto&& func = detail::get_tag<Tag>(helper::m_vis(first_any), helper::s_visitors);
+    template <typename VP>
+    template <typename Tag, typename... Ts>
+    decltype(auto) any<VP>::visit(Ts&&... args) const
+    {
+        if (! m_vis) { throw std::bad_any_cast(); }
+        auto&& func = detail::get_tag<Tag>(m_vis, s_visitors);
         static_assert(! detail::is_null_v<decltype(func)>, "this tyre::any does not support that visitor");
 
-        constexpr auto transformer = [](auto&& any) -> decltype(auto) { return helper::m_any(any); };
-        static_assert(std::is_invocable_v<decltype((func)), decltype(detail::transform_arg(std::forward<Ts>(args), transformer))...>,
+        static_assert(std::is_invocable_v<decltype((func)), decltype(detail::transform_arg(std::forward<Ts>(args), &any::m_any))...>,
             "no match to the visitor's parameter list for these argument types");
         if constexpr (std::is_same_v<std::any, typename detail::remove_cvref_t<decltype(func)>::result_type>)
         {
-            std::any any = std::invoke(func, detail::transform_arg(std::forward<Ts>(args), transformer)...);
-            if (&any.type() != &first_any.type()) { throw std::bad_any_cast(); }
-            return helper::make_from(std::move(any), helper::m_vis(first_any));
+            any result;
+            result.m_vis = m_vis;
+            result.m_any = std::invoke(func, detail::transform_arg(std::forward<Ts>(args), &any::m_any)...);
+            if (&result.type() != &type()) { throw std::bad_any_cast(); }
+            return result;
         }
-        else { return std::invoke(func, detail::transform_arg(std::forward<Ts>(args), transformer)...); }
+        else { return std::invoke(func, detail::transform_arg(std::forward<Ts>(args), &any::m_any)...); }
     }
 
     template <typename VP>

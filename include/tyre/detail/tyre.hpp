@@ -72,9 +72,9 @@ namespace tyre
         }
 
         template <typename T, typename U>
-        decltype(auto) transform_arg(T&& arg, U&& transformer)
+        decltype(auto) transform_arg(T&& arg, U transformer)
         {
-            if constexpr (is_any_v<remove_cvref_t<T>>) { return std::forward<U>(transformer)(std::forward<T>(arg)); }
+            if constexpr (is_any_v<remove_cvref_t<T>>) { return std::invoke(transformer, std::forward<T>(arg)); }
             else { (void)transformer; return std::forward<T>(arg); }
         }
 
@@ -190,12 +190,8 @@ namespace tyre
         template <typename Any>
         struct visit_helper
         {
-            static constexpr auto s_visitors = Any::s_visitors;
-            template <typename T>
-            static decltype(auto) m_vis(T&& any) { return (std::forward<T>(any).m_vis); }
-            template <typename T>
-            static decltype(auto) m_any(T&& any) { return (std::forward<T>(any).m_any); }
-            static Any make_from(std::any&& a, typename Any::erased_functions const* v) { return Any::make_from(std::move(a), v); }
+            template <typename Tag, typename... Ts>
+            static decltype(auto) visit(Any const& any, Ts&&... args) { return any.template visit<Tag>(std::forward<Ts>(args)...); }
         };
     }
 }
