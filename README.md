@@ -86,7 +86,7 @@ public:
 private:
     // Exposition only
     std::any object;
-    void const* concrete_visitors;
+    void const* erased_visitors;
 };
 ```
 
