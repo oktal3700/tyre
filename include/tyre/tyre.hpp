@@ -188,7 +188,7 @@ namespace tyre
             any result;
             result.m_vis = m_vis;
             result.m_any = std::invoke(func, detail::transform_arg(std::forward<Ts>(args), &any::m_any)...);
-            if (&result.type() != &type()) { throw std::bad_any_cast(); }
+            if (result.type() != type()) { throw std::bad_any_cast(); }
             return result;
         }
         else { return std::invoke(func, detail::transform_arg(std::forward<Ts>(args), &any::m_any)...); }

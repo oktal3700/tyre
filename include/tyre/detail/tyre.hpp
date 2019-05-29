@@ -4,6 +4,7 @@
 #include <any>
 #include <tuple>
 #include <utility>
+#include <typeinfo>
 #include <iterator>
 #include <functional>
 #include <type_traits>
@@ -67,7 +68,11 @@ namespace tyre
         template <typename T, typename U>
         decltype(auto) transform_arg(U&& arg)
         {
-            if constexpr (std::is_same_v<remove_cvref_t<U>, std::any>) { return *std::any_cast<T>(&arg); }
+            if constexpr (std::is_same_v<remove_cvref_t<U>, std::any>)
+            {
+                if (arg.type() != typeid(T)) { throw std::bad_any_cast(); }
+                return *std::any_cast<T>(&arg);
+            }
             else { return std::forward<U>(arg); }
         }
 
