@@ -201,9 +201,15 @@ namespace tyre
     }
 
     template <typename T, typename U>
-    decltype(auto) any_cast(U&& any)
+    auto any_cast(U&& any)
     {
         return std::any_cast<T>(std::forward<U>(any).m_any);
+    }
+
+    template <typename T, typename U>
+    auto* any_cast(U* any) noexcept
+    {
+        return std::any_cast<T>(&any->m_any);
     }
 
     template <typename VP, typename T, typename... Ts>
