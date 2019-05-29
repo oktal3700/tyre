@@ -55,9 +55,12 @@ Prior art
 
 These libraries implement essentially the same idea:
 
+- [Dyno](https://github.com/ldionne/dyno)
+- [[Boost].TE](https://github.com/boost-experimental/te)
 - [Boost.TypeErasure](https://www.boost.org/doc/libs/1_70_0/doc/html/boost_typeerasure.html)
 - [Boost.dynamic_any](http://cpp-experiment.sourceforge.net/boost/libs/dynamic_any/doc/)
 - [Adobe Poly](http://stlab.adobe.com/group__poly__related.html)
+- [folly::Poly](https://github.com/facebook/folly/blob/master/folly/docs/Poly.md)
 
 The standard library already contains some special cases of this pattern. For example, `std::function` supports exactly one visitor function, which is invoked using its function call operator.
 
