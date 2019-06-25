@@ -55,6 +55,7 @@ Prior art
 
 These libraries implement essentially the same idea:
 
+- [liberasure](https://github.com/atomgalaxy/liberasure)
 - [Dyno](https://github.com/ldionne/dyno)
 - [[Boost].TE](https://github.com/boost-experimental/te)
 - [Boost.TypeErasure](https://www.boost.org/doc/libs/1_70_0/doc/html/boost_typeerasure.html)
