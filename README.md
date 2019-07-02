@@ -62,6 +62,9 @@ These libraries implement essentially the same idea:
 - [Boost.dynamic_any](http://cpp-experiment.sourceforge.net/boost/libs/dynamic_any/doc/)
 - [Adobe Poly](http://stlab.adobe.com/group__poly__related.html)
 - [folly::Poly](https://github.com/facebook/folly/blob/master/folly/docs/Poly.md)
+- [P0957](https://wg21.link/p0957)
+- [cdiggins::any](http://www.drdobbs.com/an-efficient-variant-type/184402027)
+- [Open Runtime Concepts](https://stlab.cc/legacy/runtime-concepts.html#open)
 
 The standard library already contains some special cases of this pattern. For example, `std::function` supports exactly one visitor function, which is invoked using its function call operator.
 
